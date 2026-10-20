@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <title>お問い合わせ管理 | JCBC Demo</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">JCBC · AI駆動開発デモ</p>
+        <h1>お問い合わせ管理</h1>
+        <p>合成データ専用です。実在のお客様の情報・個人情報は入力しないでください。</p>
+        <p>データはこのブラウザ内だけに保存されます。</p>
+      </header>
+      <p id="error" role="alert" hidden></p>
+      <p id="notice" role="status"></p>
+      <section aria-labelledby="register-heading">
+        <h2 id="register-heading">新規お問い合わせ</h2>
+        <form id="inquiry-form" novalidate>
+          <label for="title">件名（必須・100文字以内）</label>
+          <input id="title" name="title" required aria-describedby="error" />
+          <label for="content">内容（必須・1,000文字以内）</label>
+          <textarea id="content" name="content" rows="4" required aria-describedby="error"></textarea>
+          <button type="submit">登録する</button>
+        </form>
+      </section>
+      <section aria-labelledby="list-heading">
+        <h2 id="list-heading">お問い合わせ一覧</h2>
+        <label for="filter">対応状況で絞り込み</label>
+        <select id="filter">
+          <option>すべて</option><option>未対応</option><option>対応中</option><option>完了</option>
+        </select>
+        <p id="count"></p>
+        <div id="inquiry-list"></div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
