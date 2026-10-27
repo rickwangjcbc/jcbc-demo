@@ -6,6 +6,21 @@ export interface Inquiry {
   status: string;
 }
 
+/** Filters by status and a case-insensitive title or content substring. */
+export function filterInquiries(
+  inquiries: readonly Inquiry[],
+  status: string,
+  keyword: string,
+): Inquiry[] {
+  const query = keyword.toLowerCase();
+  return inquiries.filter(
+    item =>
+      (status === 'すべて' || item.status === status) &&
+      (item.title.toLowerCase().includes(query) ||
+        item.content.toLowerCase().includes(query)),
+  );
+}
+
 /** Validates code-point lengths and rejects blank-only inputs. */
 export function validateInquiry(title: string, content: string): string[] {
   const errors: string[] = [];
