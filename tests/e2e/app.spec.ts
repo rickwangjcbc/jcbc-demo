@@ -21,11 +21,15 @@ test('登録内容と対応状況を再読み込み後も保持する', async ({
     .getByRole('article')
     .filter({hasText: '合成デモのお問い合わせ'});
   await expect(card).toBeVisible();
-  await expect(card.getByRole('combobox')).toHaveValue('未対応');
-  await card.getByRole('combobox').selectOption('完了');
+  await expect(card.getByRole('combobox', {name: /の対応状況$/})).toHaveValue(
+    '未対応',
+  );
+  await card.getByRole('combobox', {name: /の対応状況$/}).selectOption('完了');
   await page.reload();
   await expect(page.getByRole('article')).toHaveCount(4);
-  await expect(card.getByRole('combobox')).toHaveValue('完了');
+  await expect(card.getByRole('combobox', {name: /の対応状況$/})).toHaveValue(
+    '完了',
+  );
   await expect(card).toContainText('これは合成データです。');
 });
 
@@ -34,11 +38,14 @@ test('状態で絞り込み、すべてで解除し、空の結果を表示す�
   for (const status of ['未対応', '対応中', '完了']) {
     await page.getByLabel('対応状況で絞り込み').selectOption(status);
     await expect(page.getByRole('article')).toHaveCount(1);
-    await expect(page.getByRole('article').getByRole('combobox')).toHaveValue(
-      status,
-    );
+    await expect(
+      page.getByRole('article').getByRole('combobox', {name: /の対応状況$/}),
+    ).toHaveValue(status);
   }
-  await page.getByRole('article').getByRole('combobox').selectOption('未対応');
+  await page
+    .getByRole('article')
+    .getByRole('combobox', {name: /の対応状況$/})
+    .selectOption('未対応');
   await expect(
     page.getByText('該当するお問い合わせはありません。'),
   ).toBeVisible();
@@ -117,10 +124,13 @@ test('保存容量エラー時に未保存の登録を成功表示しない', as
   await page
     .getByRole('article')
     .first()
-    .getByRole('combobox')
+    .getByRole('combobox', {name: /の対応状況$/})
     .selectOption('完了');
   await expect(
-    page.getByRole('article').first().getByRole('combobox'),
+    page
+      .getByRole('article')
+      .first()
+      .getByRole('combobox', {name: /の対応状況$/}),
   ).toHaveValue('未対応');
 });
 

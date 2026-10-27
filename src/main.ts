@@ -8,6 +8,7 @@ import './style.css';
 
 const STORAGE_KEY = 'jcbc-demo.inquiries.v1';
 const STATUSES = ['未対応', '対応中', '完了'];
+const PRIORITIES = ['高', '中', '低'];
 
 function element<T extends HTMLElement>(selector: string): T {
   const result = document.querySelector<T>(selector);
@@ -22,6 +23,7 @@ const title = element<HTMLInputElement>('#title');
 const content = element<HTMLTextAreaElement>('#content');
 const filter = element<HTMLSelectElement>('#filter');
 const search = element<HTMLInputElement>('#search');
+const priorityFilter = element<HTMLSelectElement>('#priority-filter');
 const list = element<HTMLDivElement>('#inquiry-list');
 const error = element<HTMLParagraphElement>('#error');
 const notice = element<HTMLParagraphElement>('#notice');
@@ -50,7 +52,12 @@ function save(next: Inquiry[]): boolean {
 function render(): void {
   list.replaceChildren();
   element('#count').textContent = `全${inquiries.length}件`;
-  for (const item of filterInquiries(inquiries, filter.value, search.value)) {
+  for (const item of filterInquiries(
+    inquiries,
+    filter.value,
+    search.value,
+    priorityFilter.value,
+  )) {
     const article = document.createElement('article');
     const heading = document.createElement('h3');
     heading.textContent = item.title;
@@ -80,7 +87,33 @@ function render(): void {
       }
     });
     label.append(select);
-    article.append(heading, body, label);
+    const priorityLabel = document.createElement('label');
+    priorityLabel.textContent = '優先度';
+    const prioritySelect = document.createElement('select');
+    prioritySelect.setAttribute('aria-label', `${item.title}の優先度`);
+    for (const priority of PRIORITIES) {
+      const option = document.createElement('option');
+      option.value = priority;
+      option.textContent = priority;
+      prioritySelect.append(option);
+    }
+    prioritySelect.value = item.priority ?? '中';
+    prioritySelect.addEventListener('change', () => {
+      const next = inquiries.map(current =>
+        current.id === item.id
+          ? {...current, priority: prioritySelect.value}
+          : current,
+      );
+      if (save(next)) {
+        showError('');
+        notice.textContent = '優先度を保存しました。';
+        render();
+      } else {
+        prioritySelect.value = item.priority ?? '中';
+      }
+    });
+    priorityLabel.append(prioritySelect);
+    article.append(heading, body, label, priorityLabel);
     list.append(article);
   }
   if (!list.childElementCount) {
@@ -111,6 +144,7 @@ form
   });
 filter.disabled = !available;
 search.disabled = !available;
+priorityFilter.disabled = !available;
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -129,6 +163,7 @@ form.addEventListener('submit', event => {
       title: title.value.trim(),
       content: content.value.trim(),
       status: '未対応',
+      priority: '中',
     },
   ];
   if (save(next)) {
@@ -140,3 +175,4 @@ form.addEventListener('submit', event => {
 });
 filter.addEventListener('change', render);
 search.addEventListener('input', render);
+priorityFilter.addEventListener('change', render);

@@ -66,12 +66,95 @@ describe('キーワード検索', () => {
   });
 });
 
+describe('優先度', () => {
+  it.each(['高', '中', '低'])('保存済み優先度を復元する: %s', priority => {
+    const items = [
+      {id: 'saved', title: '件名', content: '本文', status: '完了', priority},
+    ];
+    expect(loadInquiries(JSON.stringify(items))).toEqual(items);
+  });
+  it.each(['緊急', '', null, 1, {}])('不正な優先度を拒否する: %j', priority => {
+    const items = [
+      {id: 'bad', title: '件名', content: '本文', status: '完了', priority},
+    ];
+    expect(() => loadInquiries(JSON.stringify(items))).toThrow();
+  });
+  it.each(['高', '中', '低'])(
+    '優先度で絞り込み他の条件も維持する: %s',
+    priority => {
+      const items = ['高', '中', '低'].flatMap((value, index) => [
+        {
+          id: `${index}-match`,
+          title: 'API',
+          content: '本文',
+          status: '完了',
+          priority: value,
+        },
+        {
+          id: `${index}-status`,
+          title: 'API',
+          content: '本文',
+          status: '未対応',
+          priority: value,
+        },
+        {
+          id: `${index}-keyword`,
+          title: '別件',
+          content: '本文',
+          status: '完了',
+          priority: value,
+        },
+      ]);
+      const before = JSON.stringify(items);
+      expect(filterInquiries(items, '完了', 'api', priority)).toEqual(
+        items.filter(
+          item =>
+            item.priority === priority &&
+            item.status === '完了' &&
+            item.title === 'API',
+        ),
+      );
+      expect(filterInquiries(items, '完了', 'api', 'すべて')).toEqual(
+        items.filter(item => item.status === '完了' && item.title === 'API'),
+      );
+      expect(JSON.stringify(items)).toBe(before);
+    },
+  );
+  it('優先度のない項目を中として絞り込む', () => {
+    const items = [{id: 'old', title: '件名', content: '本文', status: '完了'}];
+    expect(filterInquiries(items, 'すべて', '', '中')).toEqual(items);
+    expect(filterInquiries(items, 'すべて', '', '高')).toEqual([]);
+  });
+  it('初回サンプルの優先度を中にする', () => {
+    expect(loadInquiries(null).map(item => item.priority)).toEqual([
+      '中',
+      '中',
+      '中',
+    ]);
+  });
+  it('優先度のない既存データを中として扱い他の項目を維持する', () => {
+    const items = [
+      {
+        id: 'legacy',
+        title: '既存の件名',
+        content: '既存の本文',
+        status: '完了',
+      },
+    ];
+    expect(loadInquiries(JSON.stringify(items))).toEqual([
+      {...items[0], priority: '中'},
+    ]);
+  });
+});
+
 describe('初回データ', () => {
   it('保存済みの状態を復元する', () => {
     const items = [
       {id: 'saved', title: '件名', content: '本文', status: '完了'},
     ];
-    expect(loadInquiries(JSON.stringify(items))).toEqual(items);
+    expect(loadInquiries(JSON.stringify(items))).toEqual([
+      {...items[0], priority: '中'},
+    ]);
   });
   it('保存済みの空配列にサンプルを再投入しない', () => {
     expect(loadInquiries('[]')).toEqual([]);
