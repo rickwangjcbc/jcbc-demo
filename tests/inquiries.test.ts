@@ -1,6 +1,70 @@
 import {describe, expect, it} from 'vitest';
 
-import {loadInquiries, validateInquiry} from '../src/inquiries';
+import {
+  filterInquiries,
+  loadInquiries,
+  validateInquiry,
+} from '../src/inquiries';
+
+describe('キーワード検索', () => {
+  it.each(['未対応', '対応中', '完了'])(
+    '検索と対応状況の両方を満たす項目だけ返す: %s',
+    status => {
+      const items = loadInquiries(null);
+      expect(filterInquiries(items, status, '確認')).toEqual(
+        items.filter(item => item.status === status),
+      );
+      expect(filterInquiries(items, status, '表示')).toEqual(
+        status === '対応中' ? [items[1]] : [],
+      );
+    },
+  );
+  it.each(['すべて', '未対応', '対応中', '完了'])(
+    '空文字では検索だけ解除する: %s',
+    status => {
+      const items = loadInquiries(null);
+      expect(filterInquiries(items, status, '')).toEqual(
+        status === 'すべて'
+          ? items
+          : items.filter(item => item.status === status),
+      );
+    },
+  );
+  it('非一致・空配列を空の結果として返す', () => {
+    expect(
+      filterInquiries(loadInquiries(null), 'すべて', '存在しない'),
+    ).toEqual([]);
+    expect(filterInquiries([], 'すべて', '')).toEqual([]);
+  });
+  it('正規表現ではなく文字列として検索し元データと順序を保持する', () => {
+    const items = [
+      {id: '1', title: 'API [demo]', content: '本文', status: '未対応'},
+      {id: '2', title: 'API demo', content: '本文', status: '完了'},
+    ];
+    const before = JSON.stringify(items);
+    expect(filterInquiries(items, 'すべて', '[')).toEqual([items[0]]);
+    expect(filterInquiries(items, 'すべて', 'api')).toEqual(items);
+    expect(JSON.stringify(items)).toBe(before);
+  });
+  it.each(['api', 'API', 'aPi'])(
+    '件名・内容とも英字の大小を区別しない: %s',
+    keyword => {
+      const items = [
+        {id: '1', title: 'Demo API setup', content: '本文', status: '未対応'},
+        {id: '2', title: '件名', content: 'Use Api here', status: '完了'},
+      ];
+      expect(filterInquiries(items, 'すべて', keyword)).toEqual(items);
+    },
+  );
+  it('件名の部分一致で絞り込む', () => {
+    const items = loadInquiries(null);
+    expect(filterInquiries(items, 'すべて', '表示')).toEqual([items[1]]);
+  });
+  it('内容の部分一致で絞り込む', () => {
+    const items = loadInquiries(null);
+    expect(filterInquiries(items, 'すべて', '見方')).toEqual([items[1]]);
+  });
+});
 
 describe('初回データ', () => {
   it('保存済みの状態を復元する', () => {

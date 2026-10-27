@@ -1,4 +1,9 @@
-import {Inquiry, loadInquiries, validateInquiry} from './inquiries';
+import {
+  filterInquiries,
+  Inquiry,
+  loadInquiries,
+  validateInquiry,
+} from './inquiries';
 import './style.css';
 
 const STORAGE_KEY = 'jcbc-demo.inquiries.v1';
@@ -16,6 +21,7 @@ const form = element<HTMLFormElement>('#inquiry-form');
 const title = element<HTMLInputElement>('#title');
 const content = element<HTMLTextAreaElement>('#content');
 const filter = element<HTMLSelectElement>('#filter');
+const search = element<HTMLInputElement>('#search');
 const list = element<HTMLDivElement>('#inquiry-list');
 const error = element<HTMLParagraphElement>('#error');
 const notice = element<HTMLParagraphElement>('#notice');
@@ -44,10 +50,7 @@ function save(next: Inquiry[]): boolean {
 function render(): void {
   list.replaceChildren();
   element('#count').textContent = `全${inquiries.length}件`;
-  for (const item of inquiries) {
-    if (filter.value !== 'すべて' && filter.value !== item.status) {
-      continue;
-    }
+  for (const item of filterInquiries(inquiries, filter.value, search.value)) {
     const article = document.createElement('article');
     const heading = document.createElement('h3');
     heading.textContent = item.title;
@@ -107,6 +110,7 @@ form
     control.disabled = !available;
   });
 filter.disabled = !available;
+search.disabled = !available;
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -135,3 +139,4 @@ form.addEventListener('submit', event => {
   }
 });
 filter.addEventListener('change', render);
+search.addEventListener('input', render);
