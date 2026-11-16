@@ -38,8 +38,20 @@ describe('キーワード検索', () => {
   });
   it('正規表現ではなく文字列として検索し元データと順序を保持する', () => {
     const items = [
-      {id: '1', title: 'API [demo]', content: '本文', status: '未対応'},
-      {id: '2', title: 'API demo', content: '本文', status: '完了'},
+      {
+        id: '1',
+        title: 'API [demo]',
+        content: '本文',
+        status: '未対応',
+        priority: '中',
+      },
+      {
+        id: '2',
+        title: 'API demo',
+        content: '本文',
+        status: '完了',
+        priority: '中',
+      },
     ];
     const before = JSON.stringify(items);
     expect(filterInquiries(items, 'すべて', '[')).toEqual([items[0]]);
@@ -50,8 +62,20 @@ describe('キーワード検索', () => {
     '件名・内容とも英字の大小を区別しない: %s',
     keyword => {
       const items = [
-        {id: '1', title: 'Demo API setup', content: '本文', status: '未対応'},
-        {id: '2', title: '件名', content: 'Use Api here', status: '完了'},
+        {
+          id: '1',
+          title: 'Demo API setup',
+          content: '本文',
+          status: '未対応',
+          priority: '中',
+        },
+        {
+          id: '2',
+          title: '件名',
+          content: 'Use Api here',
+          status: '完了',
+          priority: '中',
+        },
       ];
       expect(filterInquiries(items, 'すべて', keyword)).toEqual(items);
     },
@@ -66,10 +90,59 @@ describe('キーワード検索', () => {
   });
 });
 
+describe('優先度', () => {
+  it('新規サンプルは「中」を持ち、指定した優先度で絞り込む', () => {
+    const items = loadInquiries(null);
+    expect(items[0].priority).toBe('中');
+    expect(filterInquiries(items, 'すべて', '', '中')).toEqual(items);
+    expect(filterInquiries(items, 'すべて', '', '高')).toEqual([]);
+  });
+  it('優先度のない既存データは「中」として読み込み他の値を維持する', () => {
+    const legacy = [
+      {id: 'saved', title: '既存件名', content: '既存内容', status: '対応中'},
+    ];
+    expect(loadInquiries(JSON.stringify(legacy))).toEqual([
+      {...legacy[0], priority: '中'},
+    ]);
+  });
+  it('状態・キーワード・優先度をAND条件で絞り込む', () => {
+    const items = [
+      {
+        id: '1',
+        title: 'API問い合わせ',
+        content: '本文',
+        status: '未対応',
+        priority: '高',
+      },
+      {
+        id: '2',
+        title: 'API問い合わせ',
+        content: '本文',
+        status: '完了',
+        priority: '高',
+      },
+      {
+        id: '3',
+        title: 'API問い合わせ',
+        content: '本文',
+        status: '未対応',
+        priority: '低',
+      },
+    ];
+    expect(filterInquiries(items, '未対応', 'API', '高')).toEqual([items[0]]);
+  });
+});
+
 describe('初回データ', () => {
   it('保存済みの状態を復元する', () => {
     const items = [
-      {id: 'saved', title: '件名', content: '本文', status: '完了'},
+      {
+        id: 'saved',
+        title: '件名',
+        content: '本文',
+        status: '完了',
+        priority: '中',
+      },
     ];
     expect(loadInquiries(JSON.stringify(items))).toEqual(items);
   });
@@ -92,7 +165,13 @@ describe('初回データ', () => {
     ).toThrow();
   });
   it('重複IDを拒否する', () => {
-    const item = {id: 'x', title: '件名', content: '本文', status: '未対応'};
+    const item = {
+      id: 'x',
+      title: '件名',
+      content: '本文',
+      status: '未対応',
+      priority: '中',
+    };
     expect(() => loadInquiries(JSON.stringify([item, item]))).toThrow();
   });
   it('呼び出しごとに独立したサンプルを返す', () => {

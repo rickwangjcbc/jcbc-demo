@@ -43,6 +43,9 @@ test('検索と状態を併用し、検索解除でも状態フィルターを�
   await filter.selectOption('すべて');
   await expect(search).toHaveValue('確認');
   await expect(page.getByRole('article')).toHaveCount(3);
+  await expect(
+    page.getByRole('article').first().getByLabel('優先度'),
+  ).toHaveValue('中');
 });
 
 test('英字の大小を区別せず検索し、検索中も登録・状態変更・保存を維持する', async ({
@@ -65,7 +68,11 @@ test('英字の大小を区別せず検索し、検索中も登録・状態変�
   await page.getByRole('button', {name: '登録する'}).click();
   await search.fill('ApI');
   await expect(page.getByRole('article')).toHaveCount(2);
+  await search.fill('Demo API');
+  await filter.selectOption('すべて');
   await page.getByLabel('Demo API setupの対応状況').selectOption('完了');
+  await page.getByLabel('Demo API setupの優先度').selectOption('高');
+  await page.getByLabel('優先度で絞り込み').selectOption('高');
   await expect(page.getByRole('article')).toHaveCount(1);
   await filter.selectOption('完了');
   await expect(page.getByRole('article')).toHaveCount(1);
