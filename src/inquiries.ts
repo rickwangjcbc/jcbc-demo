@@ -4,18 +4,21 @@ export interface Inquiry {
   title: string;
   content: string;
   status: string;
+  priority: string;
 }
 
-/** Filters by status and a case-insensitive title or content substring. */
+/** Filters by status, priority, and a case-insensitive title or content substring. */
 export function filterInquiries(
   inquiries: readonly Inquiry[],
   status: string,
   keyword: string,
+  priority = 'すべて',
 ): Inquiry[] {
   const query = keyword.toLowerCase();
   return inquiries.filter(
     item =>
       (status === 'すべて' || item.status === status) &&
+      (priority === 'すべて' || (item.priority ?? '中') === priority) &&
       (item.title.toLowerCase().includes(query) ||
         item.content.toLowerCase().includes(query)),
   );
@@ -61,7 +64,10 @@ export function loadInquiries(raw: string | null): Inquiry[] {
       }
       ids.add(item.id);
     }
-    return value as Inquiry[];
+    return value.map(item => ({
+      ...item,
+      priority: item.priority ?? '中',
+    })) as Inquiry[];
   }
   return [
     {
@@ -69,18 +75,21 @@ export function loadInquiries(raw: string | null): Inquiry[] {
       title: 'デモ操作の確認',
       content: '登録方法を教えてください。',
       status: '未対応',
+      priority: '中',
     },
     {
       id: 'sample-2',
       title: '画面表示について',
       content: '一覧の見方を確認したいです。',
       status: '対応中',
+      priority: '中',
     },
     {
       id: 'sample-3',
       title: '利用手順の確認',
       content: '操作手順を確認しました。',
       status: '完了',
+      priority: '中',
     },
   ];
 }

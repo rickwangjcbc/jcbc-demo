@@ -21,11 +21,14 @@ test('登録内容と対応状況を再読み込み後も保持する', async ({
     .getByRole('article')
     .filter({hasText: '合成デモのお問い合わせ'});
   await expect(card).toBeVisible();
-  await expect(card.getByRole('combobox')).toHaveValue('未対応');
-  await card.getByRole('combobox').selectOption('完了');
+  await expect(card.getByLabel('対応状況')).toHaveValue('未対応');
+  await expect(card.getByLabel('優先度')).toHaveValue('中');
+  await card.getByLabel('対応状況').selectOption('完了');
+  await card.getByLabel('優先度').selectOption('高');
   await page.reload();
   await expect(page.getByRole('article')).toHaveCount(4);
-  await expect(card.getByRole('combobox')).toHaveValue('完了');
+  await expect(card.getByLabel('対応状況')).toHaveValue('完了');
+  await expect(card.getByLabel('優先度')).toHaveValue('高');
   await expect(card).toContainText('これは合成データです。');
 });
 
@@ -34,16 +37,51 @@ test('状態で絞り込み、すべてで解除し、空の結果を表示す�
   for (const status of ['未対応', '対応中', '完了']) {
     await page.getByLabel('対応状況で絞り込み').selectOption(status);
     await expect(page.getByRole('article')).toHaveCount(1);
-    await expect(page.getByRole('article').getByRole('combobox')).toHaveValue(
+    await expect(page.getByRole('article').getByLabel('対応状況')).toHaveValue(
       status,
     );
   }
-  await page.getByRole('article').getByRole('combobox').selectOption('未対応');
+  await page.getByRole('article').getByLabel('対応状況').selectOption('未対応');
   await expect(
     page.getByText('該当するお問い合わせはありません。'),
   ).toBeVisible();
   await page.getByLabel('対応状況で絞り込み').selectOption('すべて');
   await expect(page.getByRole('article')).toHaveCount(3);
+});
+
+test('既存データの優先度を中として表示し、優先度フィルターを適用する', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    if (localStorage.getItem('jcbc-demo.inquiries.v1') === null) {
+      localStorage.setItem(
+        'jcbc-demo.inquiries.v1',
+        JSON.stringify([
+          {
+            id: 'legacy',
+            title: '既存問い合わせ',
+            content: '既存内容',
+            status: '対応中',
+          },
+        ]),
+      );
+    }
+  });
+  await page.goto('/');
+  const card = page.getByRole('article');
+  await expect(card.getByLabel('既存問い合わせの優先度')).toHaveValue('中');
+  await page.getByLabel('優先度で絞り込み').selectOption('高');
+  await expect(
+    page.getByText('該当するお問い合わせはありません。'),
+  ).toBeVisible();
+  await page.getByLabel('優先度で絞り込み').selectOption('中');
+  await expect(card).toContainText('既存問い合わせ');
+  await page.getByLabel('優先度で絞り込み').selectOption('すべて');
+  await card.getByLabel('既存問い合わせの優先度').selectOption('低');
+  await page.reload();
+  await expect(page.getByRole('article').getByLabel('優先度')).toHaveValue(
+    '低',
+  );
 });
 
 test('空白と文字数超過を拒否し、上限ちょうどを登録できる', async ({page}) => {
@@ -117,10 +155,10 @@ test('保存容量エラー時に未保存の登録を成功表示しない', as
   await page
     .getByRole('article')
     .first()
-    .getByRole('combobox')
+    .getByLabel('対応状況')
     .selectOption('完了');
   await expect(
-    page.getByRole('article').first().getByRole('combobox'),
+    page.getByRole('article').first().getByLabel('対応状況'),
   ).toHaveValue('未対応');
 });
 

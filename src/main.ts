@@ -21,6 +21,7 @@ const form = element<HTMLFormElement>('#inquiry-form');
 const title = element<HTMLInputElement>('#title');
 const content = element<HTMLTextAreaElement>('#content');
 const filter = element<HTMLSelectElement>('#filter');
+const priorityFilter = element<HTMLSelectElement>('#priority-filter');
 const search = element<HTMLInputElement>('#search');
 const list = element<HTMLDivElement>('#inquiry-list');
 const error = element<HTMLParagraphElement>('#error');
@@ -50,7 +51,12 @@ function save(next: Inquiry[]): boolean {
 function render(): void {
   list.replaceChildren();
   element('#count').textContent = `全${inquiries.length}件`;
-  for (const item of filterInquiries(inquiries, filter.value, search.value)) {
+  for (const item of filterInquiries(
+    inquiries,
+    filter.value,
+    search.value,
+    priorityFilter.value,
+  )) {
     const article = document.createElement('article');
     const heading = document.createElement('h3');
     heading.textContent = item.title;
@@ -80,7 +86,33 @@ function render(): void {
       }
     });
     label.append(select);
-    article.append(heading, body, label);
+    const priorityLabel = document.createElement('label');
+    priorityLabel.textContent = '優先度';
+    const prioritySelect = document.createElement('select');
+    prioritySelect.setAttribute('aria-label', `${item.title}の優先度`);
+    for (const priority of ['高', '中', '低']) {
+      const option = document.createElement('option');
+      option.value = priority;
+      option.textContent = priority;
+      prioritySelect.append(option);
+    }
+    prioritySelect.value = item.priority;
+    prioritySelect.addEventListener('change', () => {
+      const next = inquiries.map(current =>
+        current.id === item.id
+          ? {...current, priority: prioritySelect.value}
+          : current,
+      );
+      if (save(next)) {
+        showError('');
+        notice.textContent = '優先度を保存しました。';
+        render();
+      } else {
+        prioritySelect.value = item.priority;
+      }
+    });
+    priorityLabel.append(prioritySelect);
+    article.append(heading, body, label, priorityLabel);
     list.append(article);
   }
   if (!list.childElementCount) {
@@ -110,6 +142,7 @@ form
     control.disabled = !available;
   });
 filter.disabled = !available;
+priorityFilter.disabled = !available;
 search.disabled = !available;
 
 form.addEventListener('submit', event => {
@@ -129,6 +162,7 @@ form.addEventListener('submit', event => {
       title: title.value.trim(),
       content: content.value.trim(),
       status: '未対応',
+      priority: '中',
     },
   ];
   if (save(next)) {
@@ -139,4 +173,5 @@ form.addEventListener('submit', event => {
   }
 });
 filter.addEventListener('change', render);
+priorityFilter.addEventListener('change', render);
 search.addEventListener('input', render);
