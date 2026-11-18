@@ -5,6 +5,7 @@ export interface Inquiry {
   content: string;
   status: string;
   priority: string;
+  memo?: string;
 }
 
 /** Filters by status, priority, and a case-insensitive title or content substring. */
@@ -40,6 +41,14 @@ export function validateInquiry(title: string, content: string): string[] {
   return errors;
 }
 
+/** 入力全体のコードポイント数を検証し、空白だけのメモを空文字にする。 */
+export function normalizeMemo(memo: string): string {
+  if ([...memo].length > 1000) {
+    throw new Error('対応メモは1000文字以内で入力してください。');
+  }
+  return memo.trim() ? memo : '';
+}
+
 /** Loads saved inquiries, or synthetic samples on the first visit. */
 export function loadInquiries(raw: string | null): Inquiry[] {
   if (raw !== null) {
@@ -58,6 +67,8 @@ export function loadInquiries(raw: string | null): Inquiry[] {
         typeof item.title !== 'string' ||
         typeof item.content !== 'string' ||
         validateInquiry(item.title, item.content).length > 0 ||
+        (item.memo !== undefined &&
+          (typeof item.memo !== 'string' || [...item.memo].length > 1000)) ||
         !['未対応', '対応中', '完了'].includes(item.status)
       ) {
         throw new Error('保存データの形式が不正です。');
@@ -67,6 +78,7 @@ export function loadInquiries(raw: string | null): Inquiry[] {
     return value.map(item => ({
       ...item,
       priority: item.priority ?? '中',
+      memo: item.memo ?? '',
     })) as Inquiry[];
   }
   return [
@@ -76,6 +88,7 @@ export function loadInquiries(raw: string | null): Inquiry[] {
       content: '登録方法を教えてください。',
       status: '未対応',
       priority: '中',
+      memo: '',
     },
     {
       id: 'sample-2',
@@ -83,6 +96,7 @@ export function loadInquiries(raw: string | null): Inquiry[] {
       content: '一覧の見方を確認したいです。',
       status: '対応中',
       priority: '中',
+      memo: '',
     },
     {
       id: 'sample-3',
@@ -90,6 +104,7 @@ export function loadInquiries(raw: string | null): Inquiry[] {
       content: '操作手順を確認しました。',
       status: '完了',
       priority: '中',
+      memo: '',
     },
   ];
 }

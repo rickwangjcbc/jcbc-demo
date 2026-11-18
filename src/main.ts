@@ -2,6 +2,7 @@ import {
   filterInquiries,
   Inquiry,
   loadInquiries,
+  normalizeMemo,
   validateInquiry,
 } from './inquiries';
 import './style.css';
@@ -27,6 +28,7 @@ const list = element<HTMLDivElement>('#inquiry-list');
 const error = element<HTMLParagraphElement>('#error');
 const notice = element<HTMLParagraphElement>('#notice');
 let inquiries: Inquiry[] = [];
+const memoDrafts = new Map<string, string>();
 let available = false;
 
 function showError(message: string): void {
@@ -112,7 +114,37 @@ function render(): void {
       }
     });
     priorityLabel.append(prioritySelect);
-    article.append(heading, body, label, priorityLabel);
+    const memoLabel = document.createElement('label');
+    memoLabel.textContent = '対応メモ（1,000文字以内）';
+    const memo = document.createElement('textarea');
+    memo.setAttribute('aria-label', `${item.title}の対応メモ`);
+    memo.value = memoDrafts.get(item.id) ?? item.memo ?? '';
+    memo.addEventListener('input', () => {
+      memoDrafts.set(item.id, memo.value);
+    });
+    memoLabel.append(memo);
+    const saveMemo = document.createElement('button');
+    saveMemo.type = 'button';
+    saveMemo.textContent = 'メモを保存';
+    saveMemo.addEventListener('click', () => {
+      let normalized: string;
+      try {
+        normalized = normalizeMemo(memo.value);
+      } catch {
+        showError('対応メモは1000文字以内で入力してください。');
+        return;
+      }
+      const next = inquiries.map(current =>
+        current.id === item.id ? {...current, memo: normalized} : current,
+      );
+      if (save(next)) {
+        memoDrafts.delete(item.id);
+        showError('');
+        notice.textContent = 'メモを保存しました！！';
+        render();
+      }
+    });
+    article.append(heading, body, label, priorityLabel, memoLabel, saveMemo);
     list.append(article);
   }
   if (!list.childElementCount) {
@@ -163,6 +195,7 @@ form.addEventListener('submit', event => {
       content: content.value.trim(),
       status: '未対応',
       priority: '中',
+      memo: '',
     },
   ];
   if (save(next)) {

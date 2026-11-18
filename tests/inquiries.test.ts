@@ -3,6 +3,7 @@ import {describe, expect, it} from 'vitest';
 import {
   filterInquiries,
   loadInquiries,
+  normalizeMemo,
   validateInquiry,
 } from '../src/inquiries';
 
@@ -102,7 +103,7 @@ describe('優先度', () => {
       {id: 'saved', title: '既存件名', content: '既存内容', status: '対応中'},
     ];
     expect(loadInquiries(JSON.stringify(legacy))).toEqual([
-      {...legacy[0], priority: '中'},
+      {...legacy[0], priority: '中', memo: ''},
     ]);
   });
   it('状態・キーワード・優先度をAND条件で絞り込む', () => {
@@ -144,7 +145,9 @@ describe('初回データ', () => {
         priority: '中',
       },
     ];
-    expect(loadInquiries(JSON.stringify(items))).toEqual(items);
+    expect(loadInquiries(JSON.stringify(items))).toEqual([
+      {...items[0], memo: ''},
+    ]);
   });
   it('保存済みの空配列にサンプルを再投入しない', () => {
     expect(loadInquiries('[]')).toEqual([]);
@@ -183,6 +186,79 @@ describe('初回データ', () => {
     const items = loadInquiries(null);
     expect(items).toHaveLength(3);
     expect(new Set(items.map(item => item.id)).size).toBe(3);
+  });
+});
+
+describe('対応メモ', () => {
+  it.each(['あ'.repeat(1000), '😀'.repeat(1000), ` ${'あ'.repeat(998)}\n`])(
+    '1000コードポイントの入力をそのまま保持する',
+    memo => {
+      expect(normalizeMemo(memo)).toBe(memo);
+    },
+  );
+  it.each([
+    'あ'.repeat(1001),
+    '😀'.repeat(1001),
+    ` ${'あ'.repeat(999)}\n`,
+    ' '.repeat(1001),
+    '\n'.repeat(1001),
+  ])('空白・改行を含む入力全体の上限超過を正規化前に拒否する', memo => {
+    expect(() => normalizeMemo(memo)).toThrow('1000文字以内');
+  });
+  it('非空白メモの前後空白・改行を保持する', () => {
+    expect(normalizeMemo(' \n　対応内容\n次の作業　\n ')).toBe(
+      ' \n　対応内容\n次の作業　\n ',
+    );
+  });
+  it.each(['', ' \n　\t', ' '.repeat(1000)])(
+    '空白・改行だけの入力は空文字として扱う',
+    memo => {
+      expect(normalizeMemo(memo)).toBe('');
+    },
+  );
+  it('旧データの他項目を維持してメモを空欄として読み込む', () => {
+    const legacy = {
+      id: 'legacy',
+      title: '既存件名',
+      content: '既存内容',
+      status: '対応中',
+      priority: '高',
+    };
+    expect(loadInquiries(JSON.stringify([legacy]))).toEqual([
+      {...legacy, memo: ''},
+    ]);
+    expect(loadInquiries(null).every(item => item.memo === '')).toBe(true);
+  });
+  it.each([null, 123, {}, 'あ'.repeat(1001)])(
+    '不正な保存済みメモを拒否する',
+    memo => {
+      expect(() =>
+        loadInquiries(
+          JSON.stringify([
+            {
+              id: 'invalid',
+              title: '件名',
+              content: '内容',
+              status: '未対応',
+              memo,
+            },
+          ]),
+        ),
+      ).toThrow();
+    },
+  );
+  it('保存済みメモを復元し検索対象には含めない', () => {
+    const saved = {
+      id: 'saved',
+      title: '既存件名',
+      content: '既存内容',
+      status: '完了',
+      priority: '低',
+      memo: ' \nメモ限定語\n ',
+    };
+    const items = loadInquiries(JSON.stringify([saved]));
+    expect(items).toEqual([saved]);
+    expect(filterInquiries(items, 'すべて', 'メモ限定語')).toEqual([]);
   });
 });
 
