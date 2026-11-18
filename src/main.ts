@@ -140,7 +140,7 @@ function render(): void {
       if (save(next)) {
         memoDrafts.delete(item.id);
         showError('');
-        notice.textContent = 'メモを保存しました。';
+        notice.textContent = 'メモを保存しました！！';
         render();
       }
     });

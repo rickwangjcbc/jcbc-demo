@@ -14,7 +14,7 @@ test('メモを明示保存して書式を復元し、空欄保存でメモだ�
   await expect(memo).toHaveValue('');
   await memo.fill(formatted);
   await save.click();
-  await expect(page.locator('#notice')).toHaveText('メモを保存しました。');
+  await expect(page.locator('#notice')).toHaveText('メモを保存しました！！');
   await page.reload();
   await expect(memo).toHaveValue(formatted);
   for (const blank of ['', ' \n　\t']) {
@@ -151,7 +151,7 @@ test('保存失敗時は入力と保存済みデータを維持し成功表示�
   await memo.fill('再試行');
   await save.click();
   await expect(page.getByRole('alert')).toBeHidden();
-  await expect(page.locator('#notice')).toHaveText('メモを保存しました。');
+  await expect(page.locator('#notice')).toHaveText('メモを保存しました！！');
   await page.reload();
   await expect(memo).toHaveValue('再試行');
 });
