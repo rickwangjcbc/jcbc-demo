@@ -18,6 +18,7 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 | 対象・検証・承認条件 | `docs/ai-development/project-settings.md` |
 | 要件担当と技術担当の分担 | `docs/ai-development/team-collaboration-guide.md` |
 | 状態・停止・再開などの詳細 | `docs/ai-development/lifecycle-guide.md` |
+| コピーして使う工程別プロンプト | `docs/ai-development/prompt-examples.md` |
 | Issue作成（demo-issue-creation） | `docs/ai-development/workflows/issue-creation.md` |
 | 設計（demo-issue-specification） | `docs/ai-development/workflows/issue-specification.md` |
 | 開発・PR提出（demo-issue-delivery） | `docs/ai-development/workflows/issue-delivery.md` |
@@ -34,6 +35,8 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 同じブランチ名でも各人の取得時点が異なります。作業開始時は`git rev-parse HEAD`等で参照版を確認し、GitHubから読む場合もコミット固定URLを使います。作業途中で自動pullや最新ルールへの切替はしません。更新はPRで確認し、進行中案件への適用を人間が判断します。
 
 ## 4. 依頼例
+
+登録済みWorkflowの起動、設計承認、開発・PR指摘対応、MergeReady・Done確認、中断後の再開までの詳細テンプレートは`docs/ai-development/prompt-examples.md`にまとめています。以下はリポジトリの手順書を直接指定する短縮例です。
 
 以下は自然文の依頼です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録を要求する環境では人間に登録を依頼し、同名の未登録Workflowを起動できたと偽りません。
 
