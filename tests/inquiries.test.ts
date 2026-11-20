@@ -4,6 +4,7 @@ import {
   filterInquiries,
   formatCreatedAt,
   sortInquiries,
+  summarizeInquiries,
   loadInquiries,
   normalizeMemo,
   validateInquiry,
@@ -11,6 +12,47 @@ import {
 
 const loadedAt = '2026-11-18T01:02:03.456Z';
 const estimatedDate = {createdAt: loadedAt, createdAtEstimated: true};
+
+describe('summarizeInquiries', () => {
+  it('空配列では全項目を0件にする', () => {
+    expect(summarizeInquiries([])).toEqual({
+      total: 0,
+      pending: 0,
+      inProgress: 0,
+      completed: 0,
+    });
+  });
+  it.each([
+    ['未対応', {total: 2, pending: 2, inProgress: 0, completed: 0}],
+    ['対応中', {total: 2, pending: 0, inProgress: 2, completed: 0}],
+    ['完了', {total: 2, pending: 0, inProgress: 0, completed: 2}],
+  ])('全件が%sでも状況別に集計する', (status, expected) => {
+    const items = loadInquiries(null, loadedAt)
+      .slice(0, 2)
+      .map(item => ({...item, status}));
+    expect(summarizeInquiries(items)).toEqual(expected);
+  });
+  it('異なる件数の状況を集計し、入力配列・要素・順序を変更しない', () => {
+    const sample = loadInquiries(null, loadedAt)[0];
+    const items = Object.freeze(
+      ['完了', '未対応', '対応中', '完了', '対応中', '完了'].map(
+        (status, index) =>
+          Object.freeze({...sample, id: String(index), status}),
+      ),
+    );
+    const before = JSON.stringify(items);
+    const summary = summarizeInquiries(items);
+    expect(summary).toEqual({
+      total: 6,
+      pending: 1,
+      inProgress: 2,
+      completed: 3,
+    });
+    expect(summary.total).toBe(items.length);
+    expect(summary.pending + summary.inProgress + summary.completed).toBe(6);
+    expect(JSON.stringify(items)).toBe(before);
+  });
+});
 
 describe('キーワード検索', () => {
   it.each(['未対応', '対応中', '完了'])(

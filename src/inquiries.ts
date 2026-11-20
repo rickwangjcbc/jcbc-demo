@@ -10,6 +10,31 @@ export interface Inquiry {
   createdAtEstimated: boolean;
 }
 
+/** 検証済みのお問い合わせを変更せず、対応状況別の全件数を集計する。 */
+export function summarizeInquiries(inquiries: readonly Inquiry[]): {
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+} {
+  const summary = {
+    total: inquiries.length,
+    pending: 0,
+    inProgress: 0,
+    completed: 0,
+  };
+  for (const item of inquiries) {
+    if (item.status === '未対応') {
+      summary.pending++;
+    } else if (item.status === '対応中') {
+      summary.inProgress++;
+    } else if (item.status === '完了') {
+      summary.completed++;
+    }
+  }
+  return summary;
+}
+
 /** Filters by status, priority, and a case-insensitive title or content substring. */
 export function filterInquiries(
   inquiries: readonly Inquiry[],

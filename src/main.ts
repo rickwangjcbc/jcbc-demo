@@ -6,6 +6,7 @@ import {
   normalizeMemo,
   sortInquiries,
   SortOrder,
+  summarizeInquiries,
   validateInquiry,
 } from './inquiries';
 import './style.css';
@@ -61,6 +62,13 @@ function save(next: Inquiry[]): boolean {
 function render(): void {
   list.replaceChildren();
   element('#count').textContent = `全${inquiries.length}件`;
+  const summary = summarizeInquiries(inquiries);
+  element('#summary-total').textContent = `全件：${summary.total}件`;
+  element('#summary-pending').textContent = `未対応：${summary.pending}件`;
+  element('#summary-in-progress').textContent =
+    `対応中：${summary.inProgress}件`;
+  element('#summary-completed').textContent = `完了：${summary.completed}件`;
+  element('#status-summary').hidden = !available;
   const filtered = filterInquiries(
     inquiries,
     filter.value,

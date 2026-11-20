@@ -28,6 +28,15 @@
       </section>
       <section aria-labelledby="list-heading">
         <h2 id="list-heading">お問い合わせ一覧</h2>
+        <section id="status-summary" aria-labelledby="status-summary-heading" hidden>
+          <h3 id="status-summary-heading">対応状況サマリー</h3>
+          <ul>
+            <li id="summary-total"></li>
+            <li id="summary-pending"></li>
+            <li id="summary-in-progress"></li>
+            <li id="summary-completed"></li>
+          </ul>
+        </section>
         <label for="search">キーワード検索（件名・内容）</label>
         <input id="search" type="search" />
         <label for="filter">対応状況で絞り込み</label>
