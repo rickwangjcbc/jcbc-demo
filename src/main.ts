@@ -1,8 +1,11 @@
 import {
   filterInquiries,
+  formatCreatedAt,
   Inquiry,
   loadInquiries,
   normalizeMemo,
+  sortInquiries,
+  SortOrder,
   validateInquiry,
 } from './inquiries';
 import './style.css';
@@ -24,6 +27,8 @@ const content = element<HTMLTextAreaElement>('#content');
 const filter = element<HTMLSelectElement>('#filter');
 const priorityFilter = element<HTMLSelectElement>('#priority-filter');
 const search = element<HTMLInputElement>('#search');
+const sortOrder = element<HTMLSelectElement>('#sort-order');
+sortOrder.value = 'newest';
 const list = element<HTMLDivElement>('#inquiry-list');
 const error = element<HTMLParagraphElement>('#error');
 const notice = element<HTMLParagraphElement>('#notice');
@@ -38,6 +43,9 @@ function showError(message: string): void {
 }
 
 function save(next: Inquiry[]): boolean {
+  if (!available) {
+    return false;
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     inquiries = next;
@@ -53,17 +61,20 @@ function save(next: Inquiry[]): boolean {
 function render(): void {
   list.replaceChildren();
   element('#count').textContent = `全${inquiries.length}件`;
-  for (const item of filterInquiries(
+  const filtered = filterInquiries(
     inquiries,
     filter.value,
     search.value,
     priorityFilter.value,
-  )) {
+  );
+  for (const item of sortInquiries(filtered, sortOrder.value as SortOrder)) {
     const article = document.createElement('article');
     const heading = document.createElement('h3');
     heading.textContent = item.title;
     const body = document.createElement('p');
     body.textContent = item.content;
+    const createdAt = document.createElement('p');
+    createdAt.textContent = `${item.createdAtEstimated ? '登録日時（補完）' : '登録日時'}：${formatCreatedAt(item.createdAt)}`;
     const label = document.createElement('label');
     label.textContent = '対応状況';
     const select = document.createElement('select');
@@ -144,7 +155,15 @@ function render(): void {
         render();
       }
     });
-    article.append(heading, body, label, priorityLabel, memoLabel, saveMemo);
+    article.append(
+      heading,
+      body,
+      createdAt,
+      label,
+      priorityLabel,
+      memoLabel,
+      saveMemo,
+    );
     list.append(article);
   }
   if (!list.childElementCount) {
@@ -156,9 +175,30 @@ function render(): void {
 
 try {
   const raw = localStorage.getItem(STORAGE_KEY);
-  inquiries = loadInquiries(raw);
-  available = raw !== null || save(inquiries);
+  const loadedAt = new Date().toISOString();
+  const candidate = loadInquiries(raw, loadedAt);
+  const original = raw === null ? null : JSON.parse(raw);
+  const needsSave =
+    original === null ||
+    candidate.some(
+      (item, index) =>
+        item.createdAt !== original[index].createdAt ||
+        item.createdAtEstimated !== original[index].createdAtEstimated,
+    );
+  if (needsSave) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(candidate));
+      available = true;
+    } catch {
+      showError(
+        '登録日時の補完データを保存できませんでした。登録・編集を停止しています。保存設定や空き容量を確認して再読み込みしてください。既存データは変更していません。',
+      );
+    }
+  } else {
+    available = true;
+  }
   if (available) {
+    inquiries = candidate;
     render();
   }
 } catch {
@@ -176,6 +216,7 @@ form
 filter.disabled = !available;
 priorityFilter.disabled = !available;
 search.disabled = !available;
+sortOrder.disabled = !available;
 
 form.addEventListener('submit', event => {
   event.preventDefault();
@@ -196,6 +237,8 @@ form.addEventListener('submit', event => {
       status: '未対応',
       priority: '中',
       memo: '',
+      createdAt: new Date().toISOString(),
+      createdAtEstimated: false,
     },
   ];
   if (save(next)) {
@@ -208,3 +251,5 @@ form.addEventListener('submit', event => {
 filter.addEventListener('change', render);
 priorityFilter.addEventListener('change', render);
 search.addEventListener('input', render);
+
+sortOrder.addEventListener('change', render);
