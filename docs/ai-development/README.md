@@ -40,6 +40,8 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 
 以下は自然文の依頼です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録を要求する環境では人間に登録を依頼し、同名の未登録Workflowを起動できたと偽りません。
 
+運用段階と承認記録は `project-settings.md`、導入時の確認は `lifecycle-guide.md` 第19節を参照します。要件整理とIssue作成は `main` のworktreeで行い、Issue作成後は人間が用意したIssue専用の別worktreeで仕様書作成からPR提出まで進めます。
+
 ### 業務・要件担当：Issue作成
 
 ```text
@@ -57,7 +59,7 @@ docs/ai-development/workflows/issue-creation.mdを手順書として適用した
 ```text
 AGENTS.mdとdocs/ai-development/のREADME.md、rules.md、project-settings.mdを読んでください。
 Issue ＜URL＞について、docs/ai-development/workflows/issue-specification.mdを手順書として適用してください。
-参照コミットは＜共有したコミット＞、作業場所は＜実際のリポジトリ絶対パス＞です。
+参照コミットは＜共有したコミット＞、作業場所は＜人間が用意したIssue専用worktreeの絶対パス＞です。
 追加の業務判断は要件担当へ確認し、設計資料は保存後に承認を待ってください。
 ```
 
