@@ -19,10 +19,10 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 | 要件担当と技術担当の分担 | `docs/ai-development/team-collaboration-guide.md` |
 | 状態・停止・再開などの詳細 | `docs/ai-development/lifecycle-guide.md` |
 | コピーして使う工程別プロンプト | `docs/ai-development/prompt-examples.md` |
-| Issue作成（demo-issue-creation） | `docs/ai-development/workflows/issue-creation.md` |
-| 設計（demo-issue-specification） | `docs/ai-development/workflows/issue-specification.md` |
-| 開発・PR提出（demo-issue-delivery） | `docs/ai-development/workflows/issue-delivery.md` |
-| PR対応・マージ確認（demo-pr-review-response） | `docs/ai-development/workflows/pr-review-response.md` |
+| Issue作成（issue-creation） | `docs/ai-development/workflows/issue-creation.md` |
+| 設計（issue-specification） | `docs/ai-development/workflows/issue-specification.md` |
+| 開発・PR提出（issue-delivery） | `docs/ai-development/workflows/issue-delivery.md` |
+| PR対応・マージ確認（pr-review-response） | `docs/ai-development/workflows/pr-review-response.md` |
 
 ## 3. 初回準備
 
@@ -75,7 +75,12 @@ Issue ＜URL＞について、docs/ai-development/workflows/issue-delivery.mdを
 
 ## 5. 必要なスキルと環境依存
 
-このリポジトリは以下のスキル本体を同梱・自動インストールしません。実際のスキル定義を各環境で確認し、利用条件・版の相違を記録してください。利用不能なら必要な工程で停止し、人間へ報告します。
+- **プロンプトの作成**：Issue URLや採用資料のSHAなどをJSONファイルに一度だけ記入し、`docs/ai-development/skills/render-workflow-prompt/SKILL.md` で、選んだ工程の変数を展開できます。ひな形と使い方は [プロンプト集の第1節](prompt-examples.md#1-この資料の使い方) を参照してください。展開に引き継ぎファイルは不要です。
+- **引き継ぎ情報の照合**：`docs/ai-development/skills/load-workflow-context/SKILL.md` は、既存の引き継ぎ記録を読み取り、工程の入力を照合する別の手段です。使い方は [プロンプト集の第2節](prompt-examples.md#2-セッション開始時共通資料を読む) を参照してください。
+
+スキルのファイルを同梱しても、アプリには自動登録されません。
+
+以下の外部スキルは本体の同梱・自動インストールを行いません。実際のスキル定義を各環境で確認し、利用条件・版の相違を記録してください。利用不能なら必要な工程で停止し、人間へ報告します。
 
 | 工程 | スキル・依存 |
 | --- | --- |

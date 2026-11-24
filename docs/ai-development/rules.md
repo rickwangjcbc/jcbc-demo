@@ -12,12 +12,12 @@
 
 | 工程 | Workflow名 | 定義ファイル（リポジトリルート基準） |
 | --- | --- | --- |
-| 要件確認・Issue作成 | `demo-issue-creation` | `docs/ai-development/workflows/issue-creation.md` |
-| 作成済みIssueの設計 | `demo-issue-specification` | `docs/ai-development/workflows/issue-specification.md` |
-| 開発・検証・PR提出 | `demo-issue-delivery` | `docs/ai-development/workflows/issue-delivery.md` |
-| PR指摘対応・マージ後確認 | `demo-pr-review-response` | `docs/ai-development/workflows/pr-review-response.md` |
+| 要件確認・Issue作成 | `issue-creation` | `docs/ai-development/workflows/issue-creation.md` |
+| 作成済みIssueの設計 | `issue-specification` | `docs/ai-development/workflows/issue-specification.md` |
+| 開発・検証・PR提出 | `issue-delivery` | `docs/ai-development/workflows/issue-delivery.md` |
+| PR指摘対応・マージ後確認 | `pr-review-response` | `docs/ai-development/workflows/pr-review-response.md` |
 
-このBotと4Workflowはjcbc-demo向けの定義であり、他案件の対象へ自動的に読み替えない。他案件では共通原則を維持し、`docs/ai-development/project-settings.md`の案件別設定表を人間が確定して、別のBot・Workflowへ適用する。
+この文書で定める運用の対象はjcbc-demoであり、他案件の対象へ自動的に読み替えない。4つの手順書はBotプロンプトの案件設定を参照する。他案件で再利用する場合は、人間が対象と案件別設定を確定し、その案件用のBot設定と適用する資料を揃える。
 工程ごとに対象を明示した実行依頼を必要とする。前工程の終了やラベル変更だけで次工程を自動起動しない。
 本リポジトリのWorkflowはMarkdownの手順書であり、アプリ一覧への自動登録を前提にしない。ユーザーが本リポジトリの手順書の適用を明示依頼し、実行環境が許す範囲で進める。上位指示が登録済みWorkflowのみを許す場合は停止し、登録を人間へ依頼する。
 
@@ -98,7 +98,7 @@ force push・履歴改変・ブランチ削除は行わない。PRマージは�
 自分の保留レビューだけは所有とreview IDを確認し、承認された送信操作で`PENDING`から`COMMENTED`になったことを確認できる。他人のレビューを書き換えず、直接的な状態値の編集もしない。
 標準の報告は指摘別の対応コメント・提出コミット・検証結果とし、`COMMENTED`を工程の完了条件にはしない。保留レビューの送信は所有と操作権限を確認できる場合だけの例外とする。
 コメント送信・人間の承認・スレッド解決・マージ許可は別の事実として扱う。
-既存PRへの通常pushは`demo-pr-review-response`の専用手順を使う。新規PR用スキルが既存PRを検出して終了したことを、既存PRへのpush成功とみなさない。
+既存PRへの通常pushは`pr-review-response`の専用手順を使う。新規PR用スキルが既存PRを検出して終了したことを、既存PRへのpush成功とみなさない。
 
 ## R7. リスクに応じた設計と案件別設定
 
