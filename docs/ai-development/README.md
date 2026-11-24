@@ -23,6 +23,7 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 | 設計（issue-specification） | `docs/ai-development/workflows/issue-specification.md` |
 | 開発・PR提出（issue-delivery） | `docs/ai-development/workflows/issue-delivery.md` |
 | PR対応・マージ確認（pr-review-response） | `docs/ai-development/workflows/pr-review-response.md` |
+| 提出前の自己レビュー（共通補助手順） | [double-check-loop](workflows/double-check-loop.md) |
 
 ## 3. 初回準備
 
@@ -88,7 +89,7 @@ Issue ＜URL＞について、docs/ai-development/workflows/issue-delivery.mdを
 | --- | --- |
 | Issue作成 | `interview-to-issue`。手動起動、GitHub CLI・認証が必要 |
 | 通常・高リスク設計 | `clarify-spec`、先行する`expert-mode-ja` |
-| 自己レビュー | 共通Workflow `double-check-loop`とスキル`double-check`。実行環境に定義が必要 |
+| 自己レビュー | [共通補助手順](workflows/double-check-loop.md)と実環境のスキル`double-check`。各回にユーザーの明示的な実行依頼が必要 |
 | commit | `git-commit-ja` |
 | 初回push・PR作成 | `git-push-and-create-merge-request-ja` |
 | レビュー指摘 | `receiving-code-review`、自己レビュー・commitの各依存。既存PRへのpushは手順書内の専用工程 |

@@ -129,7 +129,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 
 担当は現在のREADME・設定・受け入れ条件から、必要な単体・E2E・lint・型チェック・ビルド等を決めます。環境不足・不合格・未実行を区別し、テスト削除・無効化・期待値の弱体化はしません。文書のみ等の非該当項目には理由と代替確認を示します。
 
-同じ担当が既存の `double-check-loop` に従いIssue全差分を自己レビューします。各回の差分の版・🔴🟡🟢件数・修正・検証・未解決事項を記録し、最大3サイクル以内に **最終修正後の再確認で🔴🟡ゼロ** を確認します。回数消化・修正だけでは通過せず、枠をリセットしません。既存スキルの修正制限も解除しません。同じ担当の確認を独立レビューとは呼びません。
+同じ担当が[共通補助手順 `double-check-loop`](workflows/double-check-loop.md)に従い、未追跡の提出対象も含む最終差分を自己レビューします。各回の明示的な実行依頼と指摘報告後の修正承認を待ち、最大3レビューサイクル以内に最終差分で🔴🟡ゼロを確認します。同じ担当の確認を独立レビューとは呼びません。
 
 提出ゲートは、受け入れ条件・設計の確定仕様への証拠、最終差分の必要検証成功、最終自己レビュー通過、重要不整合・権限問題・無関係な変更がないこと、合意した設計変更の必要な反映完了です。未達なら `Imp` を維持します。
 
@@ -162,8 +162,8 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 標準は「指摘別の対応コメント＋提出コミット＋検証結果」です。`COMMENTED`は完了条件にしません。
 `PENDING`／`COMMENTED`は **GitHubレビューの状態** であり、Issueの工程ラベルではありません。所有する保留レビューが実際に存在し、送信が許可される場合だけ例外として扱います。
 
-1. 同じ担当が修正・関連検証・最終差分の `double-check-loop` を完了し、主エージェントが照合します。最大3サイクル・最終修正後の🔴🟡ゼロ等の制限は同じです。
-2. 開発・自己レビュー工程を終了し、主エージェントがcommit・既存PRへの通常pushをします。レビュー対応Workflowの専用手順で対象リポジトリ・open PR・head/base・ブランチ・クリーン状態・リモートSHAと祖先関係を確認し、通常push後にremoteとPRのSHA一致を確認します。新規PR用スキルは既存PR検出時にpush前に終了するため、この更新には使いません。force push・履歴改変はしません。
+1. 同じ担当が修正・関連検証・[共通補助手順 `double-check-loop`](workflows/double-check-loop.md)による最終差分の自己レビューを行い、主エージェントが照合します。
+2. 提出ゲート通過後に開発・自己レビュー工程を終了し、主エージェントがcommit・既存PRへの通常pushをします。レビュー対応Workflowの専用手順で対象リポジトリ・open PR・head/base・ブランチ・クリーン状態・リモートSHAと祖先関係を確認し、通常push後にremoteとPRのSHA一致を確認します。新規PR用スキルは既存PR検出時にpush前に終了するため、この更新には使いません。force push・履歴改変はしません。
 3. リモートとPRの最新head SHAが提出コミットに一致することを確認してから、指摘別の対応結果・検証・未対応事項を報告し、必要な再レビューを依頼します。
 4. 自分の保留レビューがある場合だけ、所有とreview IDを確認し、承認範囲内で `COMMENT` イベントにより送信します。その後 `PENDING` から `COMMENTED` になったことを取得で確認します。状態値を直接編集しません。
 5. 他人の保留レビューは送信・変更しません。自分の保留レビューがなければ対応コメントを投稿します。送信承認がなければ未実施と報告します。
@@ -409,12 +409,12 @@ AIは区分と理由を提案しますが、人間が承認します。軽微で
 
 `Done`はマージ確認済みであって、リリース承認・配備・DB移行・ロールバック・本番動作確認・監視の完了ではありません。これらが必要な案件では責任者・条件・証拠・停止／復旧を別運用に定義し、未定のまま本番配備しません。
 
-| 工程 | 明示利用するスキル／共通Workflow |
+| 工程 | 明示利用するスキル／共通補助手順 |
 | --- | --- |
 | Issue作成 | `interview-to-issue`（ユーザー明示起動） |
 | 通常・高リスク設計 | `clarify-spec`、その先行スキル`expert-mode-ja` |
 | 軽微設計 | 人間承認付きIssue内簡易設計。`clarify-spec`非起動経路 |
-| 開発・初回提出 | `double-check-loop`（Workflow）→`double-check`、`git-commit-ja`、`git-push-and-create-merge-request-ja` |
-| PR指摘対応 | `receiving-code-review`、`double-check-loop`→`double-check`、`git-commit-ja`、レビュー対応Workflow独自の既存PR更新手順 |
+| 開発・初回提出 | [共通補助手順 `double-check-loop`](workflows/double-check-loop.md)→`double-check`、`git-commit-ja`、`git-push-and-create-merge-request-ja` |
+| PR指摘対応 | `receiving-code-review`、[共通補助手順 `double-check-loop`](workflows/double-check-loop.md)→`double-check`、`git-commit-ja`、レビュー対応Workflow独自の既存PR更新手順 |
 
 実装・不具合調査・完了報告では、環境にある`test-driven-development`・`systematic-debugging`・`verification-before-completion`等も各スキルの適用条件に従います。必要スキルが利用できなければ、未確認の代替手順で権限を広げず報告します。
