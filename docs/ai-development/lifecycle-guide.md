@@ -88,7 +88,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 
 ## 5. 4つのWorkflow
 
-### 5.1 demo-issue-creation：要件確認からIssue作成
+### 5.1 issue-creation：要件確認からIssue作成
 
 - **入力**：対象リポジトリを確認できる作業場所、要件、実行依頼、ユーザー自身によるスキルの明示起動。
 - **操作**：`interview-to-issue` の定義を確認し、一問ずつ目的、要件、検証可能な完了条件、対象外、依存関係を整理。Issue一覧全体への明示同意後に作成します。
@@ -104,7 +104,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 
 取得した既存ラベルに `Spec` があれば初期工程として提案し、一覧への同意に含めます。存在しなければスキル内で作りません。ラベルなし作成にユーザーが同意した場合だけ、その契約内でIssueを作成できますが、作成後は「Spec設定未完了」で停止します。状態未設定のまま設計開始可能とは扱いません。ローカルMarkdownだけの成果物もGitHub Issue作成完了ではありません。
 
-### 5.2 demo-issue-specification：作成済みIssueの設計
+### 5.2 issue-specification：作成済みIssueの設計
 
 - **入力**：Issue URL、実行依頼、設計書を保存するリポジトリの作業場所。既存設計書があれば参照先・承認状況。
 - **操作**：本文・全対象コメント・受け入れ条件・対象外を確認。通常 `Spec` から `Design` へ変更・再取得し、既存コードを調査して `clarify-spec` の契約に従い対話・文書化します。
@@ -116,7 +116,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 
 既存設計書は参照資料とし、上書きしません。`Design` 再開時は過去の成果物を確認し、旧 `Todo` 等を無断で設計へ戻しません。worktree待ちでも設計完了として `Todo` にできますが、開発開始条件を満たしたとは限りません。
 
-### 5.3 demo-issue-delivery：開発・検証からPR提出
+### 5.3 issue-delivery：開発・検証からPR提出
 
 - **入力**：対象Issue、実行依頼、人間が作成した専用worktreeの絶対パス・作業ブランチ、承認済み設計書の参照先・承認記録、マージ先（指定時）。
 - **操作**：通常 `Todo` から開始。Issue・設計・worktree・担当・既存差分を確認し、`Imp` の再取得後に専任担当へ依頼。実装・検証・自己レビュー後、主エージェントが証拠を照合して提出します。
@@ -134,7 +134,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 
 通過後、開発・自己レビュー工程を終了し、主エージェントが `git-commit-ja`、`git-push-and-create-merge-request-ja` の各契約に従いcommit → push → PR作成を行います。PRには `Closes #対象番号`、設計書参照、検証結果・未検証範囲・主要な設計変更を記載します。ここで `Done` にはしません。
 
-### 5.4 demo-pr-review-response：PR指摘対応とマージ後確認
+### 5.4 pr-review-response：PR指摘対応とマージ後確認
 
 - **入力**：Issue・PR、実行依頼、既存worktree・ブランチ・専任担当ID・設計書採用版、人間レビューと必須CIの条件。不明な条件は人間へ確認。
 - **操作**：全取得対象レビュー・コメント・未解決スレッドをページ分割も含め取得し、最新head SHA・base・CIを確認。指摘を分類し、修正確定なら `Rework` にして同じ担当へ依頼します。
@@ -210,7 +210,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 ### Issueを作る
 
 ```text
-rickwangjcbc/jcbc-demoについて、demo-issue-creationを実行してください。
+rickwangjcbc/jcbc-demoについて、issue-creationを実行してください。
 作業場所は<リポジトリの絶対パス>です。
 要件は<目的・困っていること・実現したいこと>です。
 Issue一覧への同意前に作成せず、必要な承認を確認してください。
@@ -225,7 +225,7 @@ Issue一覧への同意前に作成せず、必要な承認を確認してくだ
 ### 設計する
 
 ```text
-<Issue URL>について、demo-issue-specificationを実行してください。
+<Issue URL>について、issue-specificationを実行してください。
 設計書の保存先リポジトリは<絶対パス>です。
 既存設計書は<参照先と承認状況／なし>です。
 保存後の設計書を提示し、私の設計承認を待ってください。
@@ -234,7 +234,7 @@ Issue一覧への同意前に作成せず、必要な承認を確認してくだ
 ### 開発してPRを提出する
 
 ```text
-<Issue URL>について、demo-issue-deliveryを実行してください。
+<Issue URL>について、issue-deliveryを実行してください。
 人間が準備した専用worktreeは<絶対パス>、ブランチは<名前>です。
 承認済み設計書は<相対パスと絶対パス>、採用版は<版を特定する情報>です。
 設計承認記録は<承認内容・記録の参照先>です。
@@ -246,7 +246,7 @@ Issue一覧への同意前に作成せず、必要な承認を確認してくだ
 ### PR指摘に対応する／マージ準備を確認する
 
 ```text
-<Issue URL>と<PR URL>について、demo-pr-review-responseを実行してください。
+<Issue URL>と<PR URL>について、pr-review-responseを実行してください。
 worktreeは<絶対パス>、ブランチは<名前>、既存担当IDは<ID>です。
 設計書の採用版は<参照先・版>です。
 必須CIと必要な人間レビュー条件は<条件・確認先>です。
@@ -258,7 +258,7 @@ worktreeは<絶対パス>、ブランチは<名前>、既存担当IDは<ID>で�
 
 ```text
 <PR URL>は人間がマージしました。対応Issueは<Issue URL>です。
-demo-pr-review-responseでマージ後の再確認を実行してください。
+pr-review-responseでマージ後の再確認を実行してください。
 merged状態・マージ先・マージコミットとIssueの対応を取得し、
 確認できた場合だけDoneへ変更して再取得してください。
 ```
@@ -266,7 +266,7 @@ merged状態・マージ先・マージコミットとIssueの対応を取得し
 ### 提出失敗から再開する
 
 ```text
-<Issue URL>について、<demo-issue-delivery／demo-pr-review-response>を再開してください。
+<Issue URL>について、<issue-delivery／pr-review-response>を再開してください。
 同じworktreeは<絶対パス>、ブランチは<名前>、担当IDは<ID>です。
 直前工程は<工程>、成功済みは<操作とコミット・PR>です。
 失敗または結果不明は<操作と状況>、未完了は<内容>です。
