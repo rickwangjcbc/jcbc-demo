@@ -95,7 +95,7 @@ Issue ＜URL＞について、docs/ai-development/workflows/issue-delivery.mdを
 | レビュー指摘 | `receiving-code-review`、自己レビュー・commitの各依存。既存PRへのpushは手順書内の専用工程 |
 | 該当時 | `test-driven-development`、`systematic-debugging`、`verification-before-completion`等、環境の適用規則に従う |
 
-開発委任には前景実行と担当の再開機能が必要です。未対応のツールで並列書込や主エージェント実装へ無断で切り替えません。スキルの許可・禁止をリポジトリ文書で上書きしません。
+開発委任の標準は前景実行と同じ担当の前景再開です。同一対話セッションでの継続は、R2と案件別設定に従い、実地検証と人間の採用承認が揃った環境に限ります。未対応のツールで並列書込や主エージェント実装へ無断で切り替えません。スキルの許可・禁止をリポジトリ文書で上書きしません。
 
 ## 6. 引き継ぎと正本の維持
 
