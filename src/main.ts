@@ -27,6 +27,9 @@ const title = element<HTMLInputElement>('#title');
 const content = element<HTMLTextAreaElement>('#content');
 const filter = element<HTMLSelectElement>('#filter');
 const priorityFilter = element<HTMLSelectElement>('#priority-filter');
+const highPriorityShortcut = element<HTMLButtonElement>(
+  '#high-priority-shortcut',
+);
 const search = element<HTMLInputElement>('#search');
 const sortOrder = element<HTMLSelectElement>('#sort-order');
 sortOrder.value = 'newest';
@@ -223,6 +226,7 @@ form
   });
 filter.disabled = !available;
 priorityFilter.disabled = !available;
+highPriorityShortcut.disabled = !available;
 search.disabled = !available;
 sortOrder.disabled = !available;
 
@@ -258,6 +262,10 @@ form.addEventListener('submit', event => {
 });
 filter.addEventListener('change', render);
 priorityFilter.addEventListener('change', render);
+highPriorityShortcut.addEventListener('click', () => {
+  priorityFilter.value = '高';
+  render();
+});
 search.addEventListener('input', render);
 
 sortOrder.addEventListener('change', render);
