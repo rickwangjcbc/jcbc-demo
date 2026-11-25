@@ -23,7 +23,7 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 | 設計（issue-specification） | `docs/ai-development/workflows/issue-specification.md` |
 | 開発・PR提出（issue-delivery） | `docs/ai-development/workflows/issue-delivery.md` |
 | PR対応・マージ確認（pr-review-response） | `docs/ai-development/workflows/pr-review-response.md` |
-| 提出前の自己レビュー（共通補助手順） | [double-check-loop](workflows/double-check-loop.md) |
+| 提出前のAIレビュー（共通補助手順） | [double-check-loop](workflows/double-check-loop.md) |
 
 ## 3. 初回準備
 
@@ -89,19 +89,19 @@ Issue ＜URL＞について、docs/ai-development/workflows/issue-delivery.mdを
 | --- | --- |
 | Issue作成 | `interview-to-issue`。手動起動、GitHub CLI・認証が必要 |
 | 通常・高リスク設計 | `clarify-spec`、先行する`expert-mode-ja` |
-| 自己レビュー | [共通補助手順](workflows/double-check-loop.md)と実環境のスキル`double-check`。各回にユーザーの明示的な実行依頼が必要 |
+| 提出前のAIレビュー | [共通補助手順](workflows/double-check-loop.md)。同じ担当の方式では実環境の `double-check` を使用。工程別引き継ぎでは読み取り専用レビュー。各回にユーザーの明示依頼が必要 |
 | commit | `git-commit-ja` |
 | 初回push・PR作成 | `git-push-and-create-merge-request-ja` |
-| レビュー指摘 | `receiving-code-review`、自己レビュー・commitの各依存。既存PRへのpushは手順書内の専用工程 |
+| レビュー指摘 | `receiving-code-review`、AIレビュー・commitの各依存。既存PRへのpushは手順書内の専用工程 |
 | 該当時 | `test-driven-development`、`systematic-debugging`、`verification-before-completion`等、環境の適用規則に従う |
 
-開発委任の標準は前景実行と同じ担当の前景再開です。同一対話セッションでの継続は、R2と案件別設定に従い、実地検証と人間の採用承認が揃った環境に限ります。未対応のツールで並列書込や主エージェント実装へ無断で切り替えません。スキルの許可・禁止をリポジトリ文書で上書きしません。
+開発委任の標準は前景実行と同じ担当の前景再開です。同一対話セッションでの継続または工程別の新規前景セッションへの引き継ぎは、R2と案件別設定に従い、実地検証と人間の事前採用承認が揃った環境・範囲に限ります。再開失敗時に自動で切り替えません。未対応のツールで並列書込や主エージェント実装へ無断で切り替えません。スキルの許可・禁止をリポジトリ文書で上書きしません。
 
 ## 6. 引き継ぎと正本の維持
 
 - 人間同士はIssue URL・顧客確認済み内容・業務窓口を渡す。設計後は設計資料・採用版・承認・テスト方針を渡す。
 - 別端末に渡す設計資料はGitHubで実際に取得できる状態を確認する。未コミットのローカル資料は別端末から参照できない。公開するcommit・pushは別途明示依頼・承認が必要で、設計Workflowから無断実行しない。
-- 開発開始後はAI担当ID・worktree・SHA・差分・検証・指摘と未完了も渡す。別端末で同じ担当を再開できなければ、共通ルールの停止・承認交代手順に従う。
+- 開発開始後はR2の記録を次の担当工程へ引き継ぐ。採用済みの方式で継続できなければ、停止して人間へ確認する。
 - 個人環境の既存Bot・Workflowは今回変更しない。古い定義と異なる場合は上位規約と照合して人間に確認し、都合の良い方を選ばない。共有版更新後のローカルコピーの追従は自動ではない。
 - リポジトリ内のルール変更も通常のPRで確認する。承認済みの設定と、未確認の提案・環境不足を区別する。
 
