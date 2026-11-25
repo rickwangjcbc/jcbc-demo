@@ -41,7 +41,7 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 
 以下は自然文の依頼です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録を要求する環境では人間に登録を依頼し、同名の未登録Workflowを起動できたと偽りません。
 
-運用段階と承認記録は `project-settings.md`、導入時の確認は `lifecycle-guide.md` 第19節を参照します。要件整理とIssue作成は `main` のworktreeで行い、Issue作成後は人間が用意したIssue専用の別worktreeで仕様書作成からPR提出まで進めます。
+運用段階と承認記録は `project-settings.md`、導入時の確認は `lifecycle-guide.md` 第12節、本格運用中の日常手順は同ガイドの第19節を参照します。要件整理とIssue作成は `main` のworktreeで行い、Issue作成後は人間が用意したIssue専用の別worktreeで仕様書作成からPR提出まで進めます。
 
 ### 業務・要件担当：Issue作成
 
