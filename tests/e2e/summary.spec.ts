@@ -69,7 +69,7 @@ test('一覧見出し直後・検索前に初回サンプル全体の4項目を�
   await expect(
     page.locator('#status-summary + label[for="search"] + #search'),
   ).toBeVisible();
-  await expect(page.locator('#count')).toHaveText('全3件');
+  await expect(page.locator('#count')).toHaveText('表示：3件 / 全3件');
   const items = JSON.parse((await storage(page))!);
   expect(items).toHaveLength(3);
   expect(items.map((item: {status: string}) => item.status)).toEqual([

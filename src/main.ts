@@ -34,6 +34,7 @@ const search = element<HTMLInputElement>('#search');
 const sortOrder = element<HTMLSelectElement>('#sort-order');
 sortOrder.value = 'newest';
 const list = element<HTMLDivElement>('#inquiry-list');
+const count = element<HTMLParagraphElement>('#count');
 const error = element<HTMLParagraphElement>('#error');
 const notice = element<HTMLParagraphElement>('#notice');
 let inquiries: Inquiry[] = [];
@@ -64,7 +65,6 @@ function save(next: Inquiry[]): boolean {
 
 function render(): void {
   list.replaceChildren();
-  element('#count').textContent = `全${inquiries.length}件`;
   const summary = summarizeInquiries(inquiries);
   element('#summary-total').textContent = `全件：${summary.total}件`;
   element('#summary-pending').textContent = `未対応：${summary.pending}件`;
@@ -78,6 +78,10 @@ function render(): void {
     search.value,
     priorityFilter.value,
   );
+  if (available) {
+    count.textContent = `表示：${filtered.length}件 / 全${inquiries.length}件`;
+  }
+  count.hidden = !available;
   for (const item of sortInquiries(filtered, sortOrder.value as SortOrder)) {
     const article = document.createElement('article');
     const heading = document.createElement('h3');
