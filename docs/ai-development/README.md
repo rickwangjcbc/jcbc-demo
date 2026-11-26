@@ -39,9 +39,9 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 
 登録済みWorkflowの起動、設計承認、開発・PR指摘対応、MergeReady・Done確認、中断後の再開までの詳細テンプレートは`docs/ai-development/prompt-examples.md`にまとめています。以下はリポジトリの手順書を直接指定する短縮例です。
 
-開発・初回PR提出には [deliver-issue](skills/deliver-issue/SKILL.md)、既存PRへの指摘対応・マージ確認には [review-pr](skills/review-pr/SKILL.md) を使えます。利用環境で読み込まれている場合は、ユーザー自身が [短縮コマンド](prompt-examples.md#入口スキルで依頼する) で明示起動します。スキルは採用版のリポジトリ手順書を参照し、登録済みの `demo-*` Workflow は起動しません。
+開発・PR提出には [deliver-issue](skills/deliver-issue/SKILL.md)、既存PRへの指摘対応・マージ確認には [review-pr](skills/review-pr/SKILL.md) を使えます。利用環境で読み込まれている場合は、ユーザー自身が [短縮コマンド](prompt-examples.md#入口スキルで依頼する) で明示起動します。スキルは採用版のリポジトリ手順書を参照し、登録済みの `demo-*` Workflow は起動しません。
 
-以下の工程別の例は、スキルを使わず採用版の手順書を直接指定する場合の自然文です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録が必須の環境では制約を迂回しません。手順書を直接指定した場合も、初回PR提出前の既存PR照合と、提出スキルの停止条件は同じです。
+以下の工程別の例は、スキルを使わず採用版の手順書を直接指定する場合の自然文です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録が必須の環境では制約を迂回しません。手順書を直接指定した場合も、`issue-delivery` 第6節の既存PR照合・承認・停止条件は同じです。
 
 案件別の実行条件は `project-settings.md`、工程ごとの確認は `lifecycle-guide.md` 第12節、日常手順は同ガイドの第19節を参照します。要件整理とIssue作成は `main` のworktreeで行い、Issue作成後は人間が用意したIssue専用の別worktreeで仕様書作成からPR提出まで進めます。
 
@@ -93,7 +93,7 @@ Issue ＜URL＞について、docs/ai-development/workflows/issue-delivery.mdを
 | 通常・高リスク設計 | `clarify-spec`、先行する`expert-mode-ja` |
 | 提出前のAIレビュー | [共通補助手順](workflows/double-check-loop.md)。同じ担当の方式では実環境の `double-check` を使用。工程別引き継ぎでは読み取り専用レビュー。各回にユーザーの明示依頼が必要 |
 | commit | `git-commit-ja` |
-| 初回push・PR作成 | `git-push-and-create-merge-request-ja` |
+| PR提出 | [`issue-delivery` 第6節](workflows/issue-delivery.md) の提出手順。既存PR更新は [`pr-review-response` 第3節](workflows/pr-review-response.md) の専用手順 |
 | レビュー指摘 | `receiving-code-review`、AIレビュー・commitの各依存。既存PRへのpushは手順書内の専用工程 |
 | 該当時 | `test-driven-development`、`systematic-debugging`、`verification-before-completion`等、環境の適用規則に従う |
 
