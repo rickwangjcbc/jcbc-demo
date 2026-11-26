@@ -26,8 +26,8 @@
 
 ```yaml
 pr_review:
-  reviewer_candidates: []
-  request_count: 2
+  reviewer_candidates: [daydayupwww]
+  request_count: 1
   approval_policy:
     mode: minimum
     required_count: 1
