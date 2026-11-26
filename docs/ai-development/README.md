@@ -39,7 +39,9 @@ Botの人格やアプリ登録情報ではなく、Botに記載していた共�
 
 登録済みWorkflowの起動、設計承認、開発・PR指摘対応、MergeReady・Done確認、中断後の再開までの詳細テンプレートは`docs/ai-development/prompt-examples.md`にまとめています。以下はリポジトリの手順書を直接指定する短縮例です。
 
-以下は自然文の依頼です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録を要求する環境では人間に登録を依頼し、同名の未登録Workflowを起動できたと偽りません。
+開発・初回PR提出には [deliver-issue](skills/deliver-issue/SKILL.md)、既存PRへの指摘対応・マージ確認には [review-pr](skills/review-pr/SKILL.md) を使えます。利用環境で読み込まれている場合は、ユーザー自身が [短縮コマンド](prompt-examples.md#入口スキルで依頼する) で明示起動します。スキルは採用版のリポジトリ手順書を参照し、登録済みの `demo-*` Workflow は起動しません。
+
+以下の工程別の例は、スキルを使わず採用版の手順書を直接指定する場合の自然文です。リポジトリ手順書はアプリ登録済みWorkflowではありません。登録が必須の環境では制約を迂回しません。手順書を直接指定した場合も、初回PR提出前の既存PR照合と、提出スキルの停止条件は同じです。
 
 案件別の実行条件は `project-settings.md`、工程ごとの確認は `lifecycle-guide.md` 第12節、日常手順は同ガイドの第19節を参照します。要件整理とIssue作成は `main` のworktreeで行い、Issue作成後は人間が用意したIssue専用の別worktreeで仕様書作成からPR提出まで進めます。
 
