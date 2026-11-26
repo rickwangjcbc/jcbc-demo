@@ -133,7 +133,7 @@ MergeReady後のhead更新等 → 条件を再評価してReviewへ
 
 提出ゲートは、受け入れ条件・設計の確定仕様への証拠、最終差分の必要検証成功、最終差分のAIレビュー通過、重要不整合・権限問題・無関係な変更がないこと、合意した設計変更の必要な反映完了です。未達なら `Imp` を維持します。
 
-通過後、開発・AIレビュー工程を終了し、主エージェントが `git-commit-ja`、`git-push-and-create-merge-request-ja` の各契約に従いcommit → push → PR作成を行います。PRには `Closes #対象番号`、設計書参照、検証結果・未検証範囲・主要な設計変更を記載します。ここで `Done` にはしません。
+提出ゲート通過後、主エージェントは `issue-delivery.md` 第6節に従います。対応するオープンPRが0件なら通常push後に先端SHAを確認して新規PRを作成し、1件なら対象照合と更新の明示承認後に `pr-review-response.md` 第3節の専用手順で通常pushし、既存PRのheadを確認します。ここで `Done` にはしません。
 
 ### 5.4 pr-review-response：PR指摘対応とマージ後確認
 
@@ -400,7 +400,7 @@ AIは区分と理由を提案しますが、人間が承認します。軽微で
 | Issue作成 | `interview-to-issue`（ユーザー明示起動） |
 | 通常・高リスク設計 | `clarify-spec`、その先行スキル`expert-mode-ja` |
 | 軽微設計 | 人間承認付きIssue内簡易設計。`clarify-spec`非起動経路 |
-| 開発・初回提出 | [共通補助手順 `double-check-loop`](workflows/double-check-loop.md)→`double-check`、`git-commit-ja`、`git-push-and-create-merge-request-ja` |
+| 開発・PR提出 | [共通補助手順 `double-check-loop`](workflows/double-check-loop.md)、`git-commit-ja`、[開発・PR提出手順](workflows/issue-delivery.md) 第6節 |
 | PR指摘対応 | `receiving-code-review`、[共通補助手順 `double-check-loop`](workflows/double-check-loop.md)→`double-check`、`git-commit-ja`、レビュー対応Workflow独自の既存PR更新手順 |
 
 実装・不具合調査・完了報告では、環境にある`test-driven-development`・`systematic-debugging`・`verification-before-completion`等も各スキルの適用条件に従います。必要スキルが利用できなければ、未確認の代替手順で権限を広げず報告します。
