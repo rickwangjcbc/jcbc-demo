@@ -52,15 +52,19 @@
 
 ## 3. 提出と再レビュー
 
+利用者が対象Issue・既存PRとその更新を明示した場合は、検証・レビュー済みの差分を提出するだけでも本節を適用できる。追加修正や担当起動のために第2節へ戻らない。初回PR提出の依頼を更新の許可に流用せず、新規PRは作成しない。
+
+commit・push・コメント投稿・ラベル更新の前に、対象PRがオープンかつ未マージで、対象Issue・リポジトリ（originのfetch/push先を含む）・headブランチ・baseが依頼と一致すること、およびリモート先端SHAがPR head SHAと一致することを確認する。照会失敗・取得不能・対象不一致なら、未実行の書き込みを行わず停止する。
+
 1. 主エージェントが修正差分・指摘対応・検証証拠を照合し、修正と同じIssue専用worktreeの提出対象と同じ最終差分で、🔴🟡ゼロと必要なローカル検証の成功を確認する。別worktreeの結果は代用しない。確認不能、重要な未解決指摘、または検証失敗があれば提出ゲート未通過とする。
-2. 開発・AIレビューを終了し、提出対象のみであることを確認して`git-commit-ja`に従ってcommitし、スキルを終了する。
+2. 開発・AIレビューを終了し、提出対象のみであることを確認する。未コミットの場合だけ、必要な承認を得て`git-commit-ja`に従ってcommitし、スキルを終了する。コミット済みの場合は、提出コミットと検証・レビュー済みの差分が一致することを確認し、再コミットしない。
    以降は本Workflow独自の「既存PR更新」工程とする。既存PRの更新には次の専用手順を使い、新規PR用の`git-push-and-create-merge-request-ja`は使用しない。
    主エージェントは次の事前確認・通常push・結果確認を、必要なツール承認を得て実施する。
    - `git status --short`と`git branch --show-current`で未コミット変更がないことと対象ブランチを確認する。detached HEAD・既定ブランチなら停止する。
    - `git remote -v`でoriginのfetch/push先が対象リポジトリに一致することを確認する。PRを再取得し、open・非merged、headのリポジトリとブランチ、base、Issueとの対応を照合する。fork PRは本手順の対象外として停止する。
    - `git rev-parse HEAD`で提出SHAを確定し、`git ls-remote --exit-code origin 'refs/heads/<確認済みhead>'`でリモートSHAを取得する。対象refが不明・不存在なら停止する。
    - `git fetch --no-tags origin 'refs/heads/<確認済みhead>'`後、取得した`FETCH_HEAD`が先のリモートSHAと一致すること、`git merge-base --is-ancestor FETCH_HEAD HEAD`が成功することを確認する。追従不能・分岐・他者更新なら上書きせず停止する。
-   - PRのhead SHAも取得したリモートSHAに一致することを確認し、`git push origin 'HEAD:refs/heads/<確認済みhead>'`で通常pushする。山括弧部分は確認済み実値に置換し、全refを安全に単一引数として引用する。
+   - push直前にPRとリモート先端を再取得し、対象との一致、open・非merged、PR head SHAと事前に照合したリモート先端SHAの一致を再確認する。`HEAD` が承認済みの提出SHAと一致し、対象差分の検証・レビューと操作承認が揃っている場合だけ、`git push origin 'HEAD:refs/heads/<確認済みhead>'` で通常pushする。山括弧部分は確認済み実値に置換し、全refを安全に単一引数として引用する。
    - push失敗・拒否は停止する。競合解消のためのforce push・履歴改変・別手段への切り替えはしない。結果不明なら先にremoteとPRを再取得する。
    これは新規PRスキルからのフォールバックではなく、実行依頼に含まれる別工程である。上位指示がこの操作を許可しない場合は実行せず報告する。
 3. リモートとPRの最新head SHAが提出コミットと一致することを確認する。
