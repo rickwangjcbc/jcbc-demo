@@ -39,6 +39,7 @@ const error = element<HTMLParagraphElement>('#error');
 const notice = element<HTMLParagraphElement>('#notice');
 let inquiries: Inquiry[] = [];
 const memoDrafts = new Map<string, string>();
+const inquiryDrafts = new Map<string, Pick<Inquiry, 'title' | 'content'>>();
 let available = false;
 
 function showError(message: string): void {
@@ -63,8 +64,86 @@ function save(next: Inquiry[]): boolean {
   }
 }
 
-function render(): void {
+function editButton(text: string, onClick: () => void): HTMLButtonElement {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = text;
+  button.addEventListener('click', onClick);
+  return button;
+}
+
+function renderInquiryText(
+  article: HTMLElement,
+  item: Inquiry,
+): HTMLButtonElement | HTMLInputElement {
+  const heading = document.createElement('h3');
+  heading.textContent = item.title;
+  article.append(heading);
+
+  const draft = inquiryDrafts.get(item.id);
+  if (!draft) {
+    const body = document.createElement('p');
+    body.textContent = item.content;
+    const edit = editButton('編集', () => {
+      inquiryDrafts.set(item.id, {title: item.title, content: item.content});
+      render({id: item.id});
+    });
+    article.append(body, edit);
+    return edit;
+  }
+
+  const titleLabel = document.createElement('label');
+  titleLabel.textContent = '件名';
+  const titleInput = document.createElement('input');
+  titleInput.value = draft.title;
+  titleInput.addEventListener('input', () => {
+    draft.title = titleInput.value;
+  });
+  titleLabel.append(titleInput);
+  const contentLabel = document.createElement('label');
+  contentLabel.textContent = '内容';
+  const contentInput = document.createElement('textarea');
+  contentInput.value = draft.content;
+  contentInput.addEventListener('input', () => {
+    draft.content = contentInput.value;
+  });
+  contentLabel.append(contentInput);
+  article.append(
+    titleLabel,
+    contentLabel,
+    editButton('保存', () => {
+      const errors = validateInquiry(draft.title, draft.content);
+      if (errors.length) {
+        showError(errors.join('\n'));
+        return;
+      }
+      const next = inquiries.map(current =>
+        current.id === item.id
+          ? {
+              ...current,
+              title: draft.title.trim(),
+              content: draft.content.trim(),
+            }
+          : current,
+      );
+      if (save(next)) {
+        inquiryDrafts.delete(item.id);
+        showError('');
+        notice.textContent = '件名・内容を保存しました。';
+        render({id: item.id, fallback: search});
+      }
+    }),
+    editButton('キャンセル', () => {
+      inquiryDrafts.delete(item.id);
+      render({id: item.id});
+    }),
+  );
+  return titleInput;
+}
+
+function render(focus?: {id: string; fallback?: HTMLInputElement}): void {
   list.replaceChildren();
+  let focusTarget: HTMLElement | undefined = focus?.fallback;
   const summary = summarizeInquiries(inquiries);
   element('#summary-total').textContent = `全件：${summary.total}件`;
   element('#summary-pending').textContent = `未対応：${summary.pending}件`;
@@ -84,10 +163,10 @@ function render(): void {
   count.hidden = !available;
   for (const item of sortInquiries(filtered, sortOrder.value as SortOrder)) {
     const article = document.createElement('article');
-    const heading = document.createElement('h3');
-    heading.textContent = item.title;
-    const body = document.createElement('p');
-    body.textContent = item.content;
+    const editControl = renderInquiryText(article, item);
+    if (item.id === focus?.id) {
+      focusTarget = editControl;
+    }
     const createdAt = document.createElement('p');
     createdAt.textContent = `${item.createdAtEstimated ? '登録日時（補完）' : '登録日時'}：${formatCreatedAt(item.createdAt)}`;
     const label = document.createElement('label');
@@ -170,15 +249,7 @@ function render(): void {
         render();
       }
     });
-    article.append(
-      heading,
-      body,
-      createdAt,
-      label,
-      priorityLabel,
-      memoLabel,
-      saveMemo,
-    );
+    article.append(createdAt, label, priorityLabel, memoLabel, saveMemo);
     list.append(article);
   }
   if (!list.childElementCount) {
@@ -186,6 +257,7 @@ function render(): void {
     empty.textContent = '該当するお問い合わせはありません。';
     list.append(empty);
   }
+  focusTarget?.focus();
 }
 
 try {
@@ -264,12 +336,12 @@ form.addEventListener('submit', event => {
     render();
   }
 });
-filter.addEventListener('change', render);
-priorityFilter.addEventListener('change', render);
+filter.addEventListener('change', () => render());
+priorityFilter.addEventListener('change', () => render());
 highPriorityShortcut.addEventListener('click', () => {
   priorityFilter.value = '高';
   render();
 });
-search.addEventListener('input', render);
+search.addEventListener('input', () => render());
 
-sortOrder.addEventListener('change', render);
+sortOrder.addEventListener('change', () => render());
