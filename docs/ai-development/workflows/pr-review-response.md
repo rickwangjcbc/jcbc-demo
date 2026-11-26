@@ -54,7 +54,7 @@
 
 1. 主エージェントが修正差分・指摘対応・検証証拠を照合し、修正と同じIssue専用worktreeの提出対象と同じ最終差分で、🔴🟡ゼロと必要なローカル検証の成功を確認する。別worktreeの結果は代用しない。確認不能、重要な未解決指摘、または検証失敗があれば提出ゲート未通過とする。
 2. 開発・AIレビューを終了し、提出対象のみであることを確認して`git-commit-ja`に従ってcommitし、スキルを終了する。
-   以降は本Workflow独自の「既存PR更新」工程とする。新規PR用の`git-push-and-create-merge-request-ja`は、既存PRがあるとpush前に終了するため使用しない。
+   以降は本Workflow独自の「既存PR更新」工程とする。既存PRの更新には次の専用手順を使い、新規PR用の`git-push-and-create-merge-request-ja`は使用しない。
    主エージェントは次の事前確認・通常push・結果確認を、必要なツール承認を得て実施する。
    - `git status --short`と`git branch --show-current`で未コミット変更がないことと対象ブランチを確認する。detached HEAD・既定ブランチなら停止する。
    - `git remote -v`でoriginのfetch/push先が対象リポジトリに一致することを確認する。PRを再取得し、open・非merged、headのリポジトリとブランチ、base、Issueとの対応を照合する。fork PRは本手順の対象外として停止する。
